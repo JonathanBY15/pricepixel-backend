@@ -7,6 +7,7 @@ const User = require('./models/user');
 const Wishlist = require('./models/wishlist');
 const WishlistItem = require('./models/wishlistItem');
 const authRoutes = require('./routes/auth');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 // const wishlistRoutes = require('./routes/wishlistRoutes'); // Routes for wishlist functionality
 const { testSetup } = require('./controllers/testController');
 const authenticateToken = require('./middleware/auth'); // JWT authentication middleware
@@ -37,6 +38,7 @@ sequelize.sync({ force: true }) // REMOVE { force: true } IN PRODUCTION
 
 // Routes
 app.use('/api/auth', authRoutes); // Routes for user authentication (login, signup)
+app.use('/api/wishlist', authenticateToken, wishlistRoutes);
 // app.use('/api/wishlist', authenticateToken, wishlistRoutes); // Wishlist routes (protected)
 
 // Default route
