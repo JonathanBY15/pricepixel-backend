@@ -23,6 +23,29 @@ router.post('/add', authenticateToken, async (req, res) => {
   }
 });
 
+// Route to remove an item from the user's wishlist
+router.delete('/remove', authenticateToken, async (req, res) => {
+  const { gameID } = req.body; // Get gameID from the request body
+
+  try {
+    const deletedItem = await WishlistItem.destroy({
+      where: {
+        uid: req.user.uid, // Use the authenticated user's UID
+        game_id: gameID // Match the gameID to be removed
+      }
+    });
+
+    if (deletedItem) {
+      res.status(200).json({ message: 'Game removed from wishlist' });
+    } else {
+      res.status(404).json({ error: 'Game not found in wishlist' });
+    }
+  } catch (error) {
+    console.error('Error removing game from wishlist:', error);
+    res.status(500).json({ error: 'Failed to remove game from wishlist' });
+  }
+});
+
 // New route to get wishlist items for the authenticated user
 router.get('/items', authenticateToken, getWishlistItems); // Add this line
 
