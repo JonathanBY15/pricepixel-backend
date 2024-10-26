@@ -8,16 +8,16 @@ const Wishlist = require('./models/wishlist');
 const WishlistItem = require('./models/wishlistItem');
 const authRoutes = require('./routes/auth');
 const wishlistRoutes = require('./routes/wishlistRoutes');
-// const wishlistRoutes = require('./routes/wishlistRoutes'); // Routes for wishlist functionality
 const { testSetup } = require('./controllers/testController');
-const authenticateToken = require('./middleware/auth'); // JWT authentication middleware
+const authenticateToken = require('./middleware/auth');
 
 const app = express();
-const PORT = process.env.PORT || 3001; // Set your preferred port
+const PORT = process.env.PORT || 3001;
+const isDevelopment = process.env.NODE_ENV === 'development'; // Check environment
 
 // Middleware
-app.use(cors()); // Enable CORS for cross-origin requests (adjust based on your app's security needs)
-app.use(bodyParser.json()); // Parse incoming JSON data
+app.use(cors());
+app.use(bodyParser.json());
 
 // Define relationships
 User.hasOne(Wishlist, { foreignKey: 'uid', onDelete: 'CASCADE' });
@@ -27,19 +27,18 @@ Wishlist.hasMany(WishlistItem, { foreignKey: 'uid', onDelete: 'CASCADE' });
 WishlistItem.belongsTo(Wishlist, { foreignKey: 'uid' });
 
 // Sync the database
-sequelize.sync({ force: true }) // REMOVE { force: true } IN PRODUCTION
+sequelize.sync({ force: isDevelopment }) // Only force sync in development
   .then(() => {
     console.log('Database synced!');
-    testSetup();  // Run the test function to insert some data (for testing)
+    if (isDevelopment) testSetup(); // Run test data setup only in development
   })
   .catch((err) => {
     console.error('Error syncing database:', err);
   });
 
 // Routes
-app.use('/api/auth', authRoutes); // Routes for user authentication (login, signup)
+app.use('/api/auth', authRoutes);
 app.use('/api/wishlist', authenticateToken, wishlistRoutes);
-// app.use('/api/wishlist', authenticateToken, wishlistRoutes); // Wishlist routes (protected)
 
 // Default route
 app.get('/', (req, res) => {
@@ -50,4 +49,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-

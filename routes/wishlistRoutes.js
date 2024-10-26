@@ -4,22 +4,36 @@ const WishlistItem = require('../models/wishlistItem');
 const authenticateToken = require('../middleware/auth'); // To ensure the user is authenticated
 const { getWishlistItems } = require('../controllers/wishlistController'); // Import the controller
 
-// Route to add an item to the user's wishlist
+// Route to add or update an item in the user's wishlist
 router.post('/add', authenticateToken, async (req, res) => {
   const { uid, gameID, alert_price } = req.body;
 
   try {
-    // Add the wishlist item to the database
-    const newWishlistItem = await WishlistItem.create({
-      uid,
-      game_id: gameID,
-      alert_price
+    // Check if the wishlist item already exists
+    let wishlistItem = await WishlistItem.findOne({
+      where: {
+        uid,
+        game_id: gameID
+      }
     });
 
-    res.status(201).json({ message: 'Game added to wishlist', item: newWishlistItem });
+    if (wishlistItem) {
+      // Update the alert_price if the item exists
+      wishlistItem.alert_price = alert_price;
+      await wishlistItem.save();
+      res.status(200).json({ message: 'Alert price updated', item: wishlistItem });
+    } else {
+      // Add a new wishlist item if it doesn't exist
+      wishlistItem = await WishlistItem.create({
+        uid,
+        game_id: gameID,
+        alert_price
+      });
+      res.status(201).json({ message: 'Game added to wishlist', item: wishlistItem });
+    }
   } catch (error) {
-    console.error('Error adding game to wishlist:', error);
-    res.status(500).json({ error: 'Failed to add game to wishlist' });
+    console.error('Error adding/updating game in wishlist:', error);
+    res.status(500).json({ error: 'Failed to add or update game in wishlist' });
   }
 });
 
