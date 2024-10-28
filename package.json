@@ -4,7 +4,7 @@
   "description": "The idea for this project is to create a website where PC gamers can easily track the prices of their favorite games across different online stores. By using the CheapShark API, the app will let users see game prices in real time, set target prices, and get notifications when a game goes on sale for a price they want.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
